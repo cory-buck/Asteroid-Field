@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package asteroidfieldsimulation;
+package asteroidfield;
 
 /**
  *
@@ -11,7 +11,7 @@ package asteroidfieldsimulation;
  */
 public class TaskForceCommand extends Thread{
     private AsteroidSimulationGUI gui;
-    private AsteroidQueue asteroids;
+    private SortedAsteroidStack asteroids;
     private int max_shield_hits;
     private int num_shield_hits;
     private int num_asteroids_destroyed;
@@ -22,8 +22,12 @@ public class TaskForceCommand extends Thread{
     private Boolean mission_complete;
     private Thread[] probes;
     
+    @Override
     public void run(){
-        while(!destroyed && !mission_complete){}
+        while(!destroyed && !mission_complete){
+            try{sleep(0);}catch(Exception e){}
+            gui.setTime(System.currentTimeMillis());
+        }
         if(destroyed)gui.setStatus("FLEET DESTROYED");
         else gui.setStatus("SUCCESS");
     }
@@ -32,7 +36,7 @@ public class TaskForceCommand extends Thread{
         gui = new AsteroidSimulationGUI(SHIELD_DEFENSE,ASTEROIDS_TO_DESTROY, PROBE_COUNT, MAX_STORAGE);
         gui.setStatus("INITIALIZING");
         
-        asteroids = new AsteroidQueue(MAX_STORAGE);
+        asteroids = new SortedAsteroidStack(MAX_STORAGE);
         max_shield_hits = SHIELD_DEFENSE;
         num_shield_hits = 0;
         num_asteroids_destroyed = 0;
@@ -77,10 +81,10 @@ public class TaskForceCommand extends Thread{
             System.out.println("Command\t\t->\tScout, Asteroid Was Not Accepted");
             System.out.println("Command\t\t->\tFleet Incurred One Hit");
             num_shield_hits++;
+            num_asteroids_left--;
             gui.setShields(max_shield_hits - num_shield_hits);
             if(num_shield_hits == max_shield_hits){
                 gui.setStatus("SIMULATION FAILED");
-                System.out.println("Fleet Destroyed");
                 destroyed = true;
             }
         }else{
@@ -91,20 +95,23 @@ public class TaskForceCommand extends Thread{
                 System.out.println("Command\t\t->\tScout, Asteroid Accepted");
             }
         }
-        notifyAll();
+        notify();
         gui.setNumAsteroids(num_asteroids_left);
     }
     
     public synchronized Asteroid getTarget(int i){
         gui.setProbeStatus(i, "ACQUIRING_TARGET");
         while(asteroids.getSize() == 0){
-            try{wait();}
-            catch(InterruptedException e){}
+            if(mission_complete || destroyed){
+                notify();
+                return null;
+            }
+                try{wait();}
+                catch(InterruptedException e){}
         }
+        notify();
         gui.setProbeStatus(i, "DESTROYING_TARGET");
         gui.setStorage(asteroids.getSize() - 1);
-        
-        notifyAll();
         return asteroids.remove();
     }
     
@@ -112,8 +119,7 @@ public class TaskForceCommand extends Thread{
        num_asteroids_left--;
        num_asteroids_destroyed++;
        gui.setNumAsteroids(num_asteroids_left);
-       if(num_asteroids_left <= 0) gui.setProbeStatus(i, "RETURNING_TO_BASE");
-       else gui.setProbeStatus(i, "AWAITING_ORDER");
+       if(num_asteroids_left <= 0)mission_complete = true;
     }
     
     public void probeSelfDestruct(int i){
@@ -158,24 +164,4 @@ public class TaskForceCommand extends Thread{
             }           
 
     }
-    
-    public Boolean isDestroyed(int i){
-        if(destroyed){
-            gui.setProbeStatus(i,"REPORTING_TARGET");
-            return true;
-        }else{
-            gui.setProbeStatus(i, "ABANDONING_MISSION");
-            return false;
-        }
-    }   
-    
-    public Boolean missionComplete(int i){
-        if(num_asteroids_left <= 0){
-            gui.setProbeStatus(i, "RETURNING_TO_BASE");
-            return true;
-        }else{
-            return false;
-        }
-    }
-
 }

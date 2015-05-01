@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package asteroidfieldsimulation;
+package asteroidfield;
 
 import java.util.Random;
 
@@ -17,6 +17,7 @@ public class PoissonDistribution {
     public double nextPoisson(double mean){
         double input = rand.nextDouble();
         double output;
+        
         if(0 <= input && 0.1 > input){
             output = 0;
         }else if(0.1 <= input && 0.2 > input){
@@ -50,6 +51,23 @@ public class PoissonDistribution {
         }else{
             output = 8.0;
         }
+        
         return output * mean;
+        
+        
+    }
+    
+    public double nextSize(){
+        double variant = rand.nextDouble();
+        
+        if(variant <= 0.2) return 3;
+        else if(variant > 0.2 && variant <= 0.5) return 6;
+        else if(variant > 0.5 && variant <= 0.7) return 9;
+        else return 11;
+        
+    }
+    
+    public double nextImpact(){
+        return rand.nextDouble() * 15;
     }
 }

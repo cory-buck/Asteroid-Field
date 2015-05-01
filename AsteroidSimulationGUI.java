@@ -4,11 +4,16 @@
  * and open the template in the editor.
  */
 
-package asteroidfieldsimulation;
+package asteroidfield;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
+import static java.lang.Thread.sleep;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import javax.swing.*;
-import javax.swing.text.AbstractDocument.Content;
 /**
  *
  * @author cBeezy
@@ -18,6 +23,7 @@ public class AsteroidSimulationGUI extends JFrame{
     private int num_asteroids;
     private int num_probes;
     private int storage_size;
+    
     
     private JPanel header;
     private JPanel body;
@@ -38,6 +44,7 @@ public class AsteroidSimulationGUI extends JFrame{
     private JPanel[] asteroids;
     
     private JLabel sim_status_label;
+    private JLabel sim_time_label;
     private JLabel shield_contents_label;
     private JLabel storage_contents_label;
     private JLabel probe_contents_label;
@@ -52,40 +59,57 @@ public class AsteroidSimulationGUI extends JFrame{
         num_probes = p;
         storage_size = c;
         
+        
         setTitle("Asteroid Simulation");
         setLayout(null);
         setSize(500,500);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setBackground(Color.BLACK);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         header = new JPanel();
-        header.setBounds(0,0,500,40);
+        header.setBounds(0,0,500,50);
+        header.setBackground(Color.GRAY);
         
         body = new JPanel();
         body.setBounds(0,50,500,450);
+        body.setBackground(Color.GRAY);
+        
         
         add(header);
         add(body);
         
         sim_status_label = new JLabel("SIMULATION STATUS");
+        sim_status_label.setBackground(Color.BLACK);
+        sim_status_label.setForeground(Color.WHITE);
+        
+        sim_time_label = new JLabel("\tTIME");
+        sim_time_label.setBackground(Color.BLACK);
+        sim_time_label.setForeground(Color.WHITE);
         
         header.add(sim_status_label);
+        header.add(sim_time_label);
         
         shields_panel = new JPanel();
-        shields_panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        shields_panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         shields_panel.setBounds(5,0,75,400);
+        shields_panel.setBackground(Color.GRAY);
         
         storage_panel = new JPanel();
-        storage_panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        storage_panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         storage_panel.setBounds(85,0,75,400);
+        storage_panel.setBackground(Color.GRAY);
         
         probes_panel = new JPanel();
-        probes_panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        probes_panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         probes_panel.setBounds(165,0,210,400);
+        probes_panel.setBackground(Color.GRAY);
         
         asteroids_panel = new JPanel();
-        asteroids_panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        asteroids_panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         asteroids_panel.setBounds(380,0,100,400);
+        asteroids_panel.setBackground(Color.GRAY);
         
         body.setLayout(null);
         body.add(shields_panel);
@@ -97,8 +121,10 @@ public class AsteroidSimulationGUI extends JFrame{
         shield_contents_label = new JLabel("Sheilds");
         shield_contents_label.setBounds(5,5,65,20);
         shield_contents_label.setHorizontalAlignment(JLabel.CENTER);
+        shield_contents_label.setForeground(Color.WHITE);
         shield_contents_panel = new JPanel();
         shield_contents_panel.setBounds(5,25,65,370);
+        shield_contents_panel.setBackground(Color.GRAY);
         shields_panel.add(shield_contents_label);
         shields_panel.add(shield_contents_panel);
         
@@ -106,8 +132,11 @@ public class AsteroidSimulationGUI extends JFrame{
         storage_contents_label = new JLabel("Storage");
         storage_contents_label.setBounds(5,5,65,20);
         storage_contents_label.setHorizontalAlignment(JLabel.CENTER);
+        storage_contents_label.setForeground(Color.WHITE);
         storage_contents_panel = new JPanel();
         storage_contents_panel.setBounds(5,25,65,370);
+        storage_contents_panel.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        storage_contents_panel.setBackground(Color.GRAY);
         storage_panel.add(storage_contents_label);
         storage_panel.add(storage_contents_panel);
         
@@ -115,8 +144,10 @@ public class AsteroidSimulationGUI extends JFrame{
         probe_contents_label= new JLabel("Probes");
         probe_contents_label.setBounds(5,5,200,20);
         probe_contents_label.setHorizontalAlignment(JLabel.CENTER);
+        probe_contents_label.setForeground(Color.WHITE);
         probe_contents_panel = new JPanel();
         probe_contents_panel.setBounds(5,25,200,370);
+        probe_contents_panel.setBackground(Color.GRAY);
         probes_panel.add(probe_contents_label);
         probes_panel.add(probe_contents_panel);
         
@@ -124,8 +155,10 @@ public class AsteroidSimulationGUI extends JFrame{
         asteroid_contents_label = new JLabel("Asteroids");
         asteroid_contents_label.setBounds(5,5,90,25);
         asteroid_contents_label.setHorizontalAlignment(JLabel.CENTER);
+        asteroid_contents_label.setForeground(Color.WHITE);
         asteroid_contents_panel = new JPanel();
         asteroid_contents_panel.setBounds(5,25,90,370);
+        asteroid_contents_panel.setBackground(Color.GRAY);
         asteroids_panel.add(asteroid_contents_label);
         asteroids_panel.add(asteroid_contents_panel);
         
@@ -148,9 +181,12 @@ public class AsteroidSimulationGUI extends JFrame{
         probe_labels = new JLabel[num_probes];
         for(int i = 0; i < num_probes; i++){
             probes[i] = new JPanel();
-            probe_labels[i] = new JLabel("Probe " + i);
+            if(i == 0)probe_labels[i] = new JLabel("Scout Probe");
+            else if(i == 1 || i == 2) probe_labels[i] = new JLabel("Photon Torpedo Probe " + i);
+            else probe_labels[i] = new JLabel("Phaser Probe " + (i - 2));
+            probe_labels[i].setForeground(Color.WHITE);
             probe_contents_panel.add(probes[i]);
-            probes[i].add(probe_labels[i]);
+            probes[i].add(probe_labels[i], BorderLayout.CENTER);
         }
         
         asteroid_contents_panel.setLayout(new GridLayout(num_asteroids/2, 2, 5, 5));
@@ -162,11 +198,21 @@ public class AsteroidSimulationGUI extends JFrame{
         setShields(shields);
         setNumAsteroids(num_asteroids);
         for(int i = 0; i < num_probes; i++)setProbeStatus(i, "AWAITING_ORDER");
+        
         setVisible(true);
     }
     
+    
+    
+    public void setTime(long t){
+        String time = "";
+        DateFormat df = new SimpleDateFormat("HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("CST"));
+        sim_time_label.setText("at " + df.format(new Date(t)));
+    }
+    
     public void setStatus(String s){
-        sim_status_label.setText("Simulation Status: " + s);
+        sim_status_label.setText("Status: " + s);
     }
     
     public void setShields(int s){

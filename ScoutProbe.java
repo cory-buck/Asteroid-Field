@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package asteroidfieldsimulation;
+package asteroidfield;
 
 import static java.lang.Math.log;
 import java.util.Random;
@@ -26,6 +26,7 @@ public class ScoutProbe extends Thread{
     private TaskForceCommand command;
 
     ScoutProbe(int i , TaskForceCommand t){
+        System.out.println("Scout probe id: " + i);
         id = i;
         curr_order = "";
         curr_asteroid = null;
@@ -39,7 +40,6 @@ public class ScoutProbe extends Thread{
         while(curr_order.equals("ACQUIRE_NEXT_TARGET")){
             next_asteroid_id++;
             next_asteroid_detection = p_dist.nextPoisson(4.0) * 1000;
-            System.out.println("Detection: " + next_asteroid_detection);
             try{
                 Thread.sleep(((int)next_asteroid_detection));
             }catch(InterruptedException e){}
@@ -52,6 +52,5 @@ public class ScoutProbe extends Thread{
             }else break;            
             curr_order = command.giveOrder(id, curr_order);
         }
-        System.out.println("Scout\t\t->\tAbandoning Asteroid Search");
     }
 }

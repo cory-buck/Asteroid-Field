@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-package asteroidfieldsimulation;
+package asteroidfield;
 
 /**
  *
  * @author cBeezy
  */
 public class SortedAsteroidStack implements AsteroidStorage{
-    private Asteroid[] storage;
+    final private Asteroid[] storage;
     private int num_items;
     
     public SortedAsteroidStack(int MAX){
@@ -23,20 +23,15 @@ public class SortedAsteroidStack implements AsteroidStorage{
     public void insert(Asteroid a){       
         Asteroid temp = a;
         Asteroid temp2;
-        
-        double temp_time;
-        double temp2_time;
         for(int i = 0; i < num_items; i++){
             temp2 = storage[i];
-            temp_time = temp.getTimeDiscovered() + temp.getTimeToImpact();
-            temp2_time = temp2.getTimeDiscovered() + temp2.getTimeToImpact();
-            
-            if(temp2_time < temp_time){
-                storage[i] = temp;
-                temp = temp2;
+            if(storage[i] != null){
+                if(temp2.getTimeOfImpact() < temp.getTimeOfImpact()){
+                    storage[i] = temp;
+                    temp = temp2;
+                }
             }
         }
-        
         storage[num_items] = temp;
         num_items++;
     }    

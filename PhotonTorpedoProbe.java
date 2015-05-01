@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package asteroidfieldsimulation;
+package asteroidfield;
 
 /**
  *
@@ -32,27 +32,29 @@ public class PhotonTorpedoProbe extends Thread{
         while(curr_order.equals("ACQUIRE_NEXT_TARGET")){
             System.out.println("Probe " + id + "\t\t->\tAcquiring Target");
             curr_asteroid = command.getTarget(id);
-            curr_asteroid_impact_time = curr_asteroid.getTimeDiscovered() + curr_asteroid.getTimeToImpact();
-            curr_asteroid_destruction_time = System.currentTimeMillis() + (curr_asteroid.getMass() / weapon_damage) * weapon_fire_rate;
-            if(curr_asteroid_destruction_time < curr_asteroid_impact_time){
-                curr_order = command.giveOrder(id, curr_order);
-                if(curr_order.equals("RETURN_TO_BASE")) break;
-                while(curr_asteroid.getMass() > 0){
-                    System.out.println("Probe " + id + "\t\t->\tFiring at Asteroid " + curr_asteroid.getId());
-                    curr_asteroid.setMass(curr_asteroid.getMass() - weapon_damage);
-                    try{
-                        sleep(weapon_fire_rate * 1000);
-                    }catch(InterruptedException e){
+            if(curr_asteroid != null){
+                curr_asteroid_destruction_time = System.currentTimeMillis() + (curr_asteroid.getMass() / weapon_damage) * weapon_fire_rate;
+                System.out.println("Asteroid Impact Time" + (  curr_asteroid.getTimeOfImpact() - curr_asteroid_destruction_time));
+                if(curr_asteroid_destruction_time < curr_asteroid.getTimeOfImpact()){
+                    curr_order = command.giveOrder(id, curr_order);
+                    if(curr_order.equals("RETURN_TO_BASE")) break;
+                    while(curr_asteroid.getMass() > 0){
+                        System.out.println("Probe " + id + "\t\t->\tFiring at Asteroid " + curr_asteroid.getId());
+                        curr_asteroid.setMass(curr_asteroid.getMass() - weapon_damage);
+                        try{
+                            sleep(weapon_fire_rate * 1000);
+                        }catch(InterruptedException e){
 
+                        }
                     }
-                }
-                System.out.println("Probe " + id + "\t\t->\tDestroyed Asteroid " + curr_asteroid.getId());
-                command.targetDestroyed(id);
-            }else{
-                System.out.println("Probe " + id + "\t\t->\tSelf Destructing");
-                command.probeSelfDestruct(id);
-                break;
-            }       
+                    System.out.println("Probe " + id + "\t\t->\tDestroyed Asteroid " + curr_asteroid.getId());
+                    command.targetDestroyed(id);
+                }else{
+                    System.out.println("Probe " + id + "\t\t->\tSelf Destructing");
+                    command.probeSelfDestruct(id);
+                    break;
+                }     
+            }
             curr_order = command.giveOrder(id, curr_order);
         }
     }

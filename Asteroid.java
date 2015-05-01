@@ -3,9 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package asteroidfieldsimulation;
+package asteroidfield;
 
 import java.util.Random;
+
 /**
  *
  * @author cory
@@ -17,6 +18,7 @@ public class Asteroid {
     private float mass_variant;
     private double time_discovered;
     private double time_to_impact;
+    private double time_of_impact;
     
     Asteroid(int i,double d){
         rand = new Random();
@@ -32,7 +34,8 @@ public class Asteroid {
             mass = 11;
         }
         time_discovered = d;
-        time_to_impact = rand.nextDouble() * 15.0;
+        time_to_impact = rand.nextDouble() * 15.0 * 1000;
+        time_of_impact = time_discovered + time_to_impact;
     }
     
     public int getId(){
@@ -50,4 +53,10 @@ public class Asteroid {
     public double getTimeToImpact(){
         return time_to_impact;
     }
+    
+    public double getTimeOfImpact(){
+        return time_of_impact;
+    }
+    
+    
 }

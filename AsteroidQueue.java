@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-package asteroidfieldsimulation;
+package asteroidfield;
 
 /**
  *
  * @author cBeezy
  */
 public class AsteroidQueue implements AsteroidStorage{
-    private Asteroid[] storage;
+    final private Asteroid[] storage;
     private int num_items;
     private int front;
     private int back;
